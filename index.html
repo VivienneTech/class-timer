@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
+:root{
   --red:#c4161c;
   --blue:#003a8f;
   --orange:#ff8800;
@@ -15,14 +15,14 @@
 
 body{
   margin:0;
-  font-family:system-ui, sans-serif;
+  font-family:system-ui,sans-serif;
   background:var(--light);
 }
 
 header{
+  background:white;
   text-align:center;
   padding:0.6rem;
-  background:white;
   border-bottom:3px solid var(--red);
 }
 
@@ -36,7 +36,6 @@ h1{margin:0;color:var(--red);}
   padding:0.8rem;
 }
 
-/* PANELS */
 .panel{
   background:white;
   border-radius:14px;
@@ -69,36 +68,34 @@ h1{margin:0;color:var(--red);}
 }
 
 .delete{
-  align-self:flex-end;
   background:var(--blue);
   color:white;
   border:none;
   border-radius:6px;
+  padding:0.4rem;
   font-size:1rem;
-  padding:0.4rem 0.6rem;
+  align-self:flex-end;
 }
 
 /* TIMER */
 #title{
   font-size:2.6rem;
-  font-weight:700;
   text-align:center;
+  font-weight:700;
 }
 
 #note{
   text-align:center;
   min-height:40px;
-  font-size:1.1rem;
 }
 
 #time{
-  font-size:4.5rem;
+  font-size:4.8rem;
   text-align:center;
   color:var(--blue);
 }
 
-.warning{color:var(--red);}
-.alert{color:var(--orange);}
+.critical{color:var(--red);}
 
 .progress{
   height:22px;
@@ -106,11 +103,14 @@ h1{margin:0;color:var(--red);}
   border-radius:12px;
   overflow:hidden;
 }
+
 .bar{
   height:100%;
-  background:var(--blue);
   width:100%;
+  background:var(--blue);
 }
+
+.bar.critical{background:var(--red);}
 
 /* BUTTONS */
 .btn{
@@ -126,7 +126,7 @@ h1{margin:0;color:var(--red);}
 .next{background:var(--blue);color:white;}
 
 .smallBtn{
-  font-size:1.2rem;
+  font-size:1.1rem;
   padding:0.6rem;
   margin-top:0.4rem;
   width:100%;
@@ -136,15 +136,20 @@ h1{margin:0;color:var(--red);}
   border-radius:8px;
 }
 
-/* RESPONSIVE */
+/* TRANSITION */
+.transition{
+  animation:flash 0.8s ease;
+}
+
+@keyframes flash{
+  from{background:var(--orange);}
+  to{background:white;}
+}
+
 @media(min-width:768px){
   .main{flex-direction:row;}
   .panel{flex:1;}
-  #time{font-size:5.5rem;}
-}
-
-@media(min-width:1024px){
-  #time{font-size:6.5rem;}
+  #time{font-size:6rem;}
 }
 </style>
 </head>
@@ -158,18 +163,24 @@ h1{margin:0;color:var(--red);}
 
 <div class="main">
 
-<!-- LEFT -->
+<!-- LEFT PANEL -->
 <div class="panel">
-  <button class="smallBtn" onclick="loadTemplate(90)">90 minutes</button>
-  <button class="smallBtn" onclick="loadTemplate(120)">120 minutes</button>
+  <button class="smallBtn" onclick="loadTemplate(90)">90-minute class</button>
+  <button class="smallBtn" onclick="loadTemplate(120)">120-minute class</button>
 
   <div class="activities" id="activities"></div>
 
   <button class="smallBtn" onclick="addActivity()">➕ Add Activity</button>
   <button class="smallBtn" onclick="addBreak()">☕ Break</button>
+
+  <input id="lessonName" placeholder="Lesson name…" style="margin-top:0.6rem;padding:0.5rem;font-size:1.1rem;width:100%;border-radius:8px;border:1px solid #ccc">
+
+  <button class="smallBtn" onclick="saveLesson()">💾 Save Lesson</button>
+
+  <div id="savedLessons"></div>
 </div>
 
-<!-- RIGHT -->
+<!-- RIGHT PANEL -->
 <div class="panel">
   <div id="title">Ready</div>
   <div id="note"></div>
@@ -180,19 +191,18 @@ h1{margin:0;color:var(--red);}
   <button class="btn start" onclick="start()">START</button>
   <button class="btn pause" onclick="pause()">PAUSE</button>
   <button class="btn next" onclick="next()">NEXT</button>
+  <button class="btn next" onclick="toggleFullScreen()">FULL SCREEN</button>
 </div>
 
 </div>
 
 <script>
-/* ===== BUILT-IN DING SOUND ===== */
-function playDing(count=1){
+/* SOUND */
+function playDing(n=1){
   const ctx=new (window.AudioContext||window.webkitAudioContext)();
   let t=ctx.currentTime;
-  for(let i=0;i<count;i++){
-    const o=ctx.createOscillator();
-    const g=ctx.createGain();
-    o.type="sine";
+  for(let i=0;i<n;i++){
+    const o=ctx.createOscillator(), g=ctx.createGain();
     o.frequency.value=880;
     g.gain.setValueAtTime(0.001,t);
     g.gain.exponentialRampToValueAtTime(0.3,t+0.02);
@@ -203,16 +213,16 @@ function playDing(count=1){
   }
 }
 
-/* ===== TIMER LOGIC ===== */
+/* STATE */
 let activities=[], idx=0, remain=0, total=0, loop=null;
-let d3=false,d2=false,dEnd=false;
 
-const list=document.getElementById("activities");
+const list=activitiesEl=document.getElementById("activities");
 const title=document.getElementById("title");
 const note=document.getElementById("note");
 const time=document.getElementById("time");
 const bar=document.getElementById("bar");
 
+/* RENDER */
 function render(){
   list.innerHTML="";
   activities.forEach((a,i)=>{
@@ -220,9 +230,9 @@ function render(){
     d.className="activity"+(a.break?" break":"");
     d.innerHTML=`
       <input value="${a.name}">
-      <input type="number" min="5" max="80" value="${a.min}">
-      <input placeholder="Note..." value="${a.note||''}">
-      <button class="delete">🦄</button>
+      <input type="number" min="5" value="${a.min}">
+      <input placeholder="Note…" value="${a.note||""}">
+      <button class="delete">✖</button>
     `;
     const inp=d.querySelectorAll("input");
     inp[0].oninput=e=>a.name=e.target.value;
@@ -232,15 +242,16 @@ function render(){
     if(i===idx)d.style.border="2px solid var(--blue)";
     list.appendChild(d);
   });
-  if(list.children[idx])list.children[idx].scrollIntoView({block:"center"});
 }
 
+/* TIMER */
 function update(){
   const m=Math.floor(remain/60);
   const s=remain%60;
   time.textContent=`${m}:${s.toString().padStart(2,"0")}`;
   bar.style.width=`${remain/total*100}%`;
-  time.className=remain<=120?"warning":remain<=180?"alert":"";
+  time.className=remain<=120?"critical":"";
+  bar.className=remain<=120?"bar critical":"bar";
 }
 
 function start(){
@@ -249,26 +260,77 @@ function start(){
   title.textContent=a.name;
   note.textContent=a.note||"";
   remain=a.min*60; total=remain;
-  d3=d2=dEnd=false;
+  title.classList.add("transition");
   update();
 
   loop=setInterval(()=>{
     remain--; update();
-    if(remain===180&&!d3){playDing(1);d3=true;}
-    if(remain===120&&!d2){playDing(2);d2=true;}
-    if(remain<=0&&!dEnd){playDing(3);dEnd=true;}
     if(remain<=0){
-      clearInterval(loop);loop=null;idx++;
-      activities[idx]?start():title.textContent="Class finished 🎉";
+      clearInterval(loop); loop=null;
+      title.textContent="Next activity…";
+      title.style.color="var(--orange)";
+      playDing(2);
+      setTimeout(()=>{
+        title.style.color="var(--blue)";
+        idx++;
+        activities[idx]?start():title.textContent="Class finished 🎉";
+      },1200);
     }
   },1000);
 }
 
 function pause(){clearInterval(loop);loop=null;}
 function next(){pause();idx++;activities[idx]?start():title.textContent="Class finished 🎉";}
+
+/* ACTIVITY */
 function addActivity(){activities.push({name:"New Activity",min:10,note:""});render();}
 function addBreak(){activities.push({name:"Break",min:10,break:true,note:""});render();}
 
+/* LESSON SAVE */
+function getLessons(){return JSON.parse(localStorage.getItem("eslLessons")||"{}");}
+
+function saveLesson(){
+  const name=document.getElementById("lessonName").value.trim();
+  if(!name)return alert("Name the lesson first.");
+  const lessons=getLessons();
+  lessons[name]=activities;
+  localStorage.setItem("eslLessons",JSON.stringify(lessons));
+  renderLessons();
+}
+
+function loadLesson(n){
+  activities=getLessons()[n];
+  idx=0; render();
+}
+
+function deleteLesson(n){
+  const l=getLessons(); delete l[n];
+  localStorage.setItem("eslLessons",JSON.stringify(l));
+  renderLessons();
+}
+
+function renderLessons(){
+  const box=document.getElementById("savedLessons");
+  box.innerHTML="";
+  Object.keys(getLessons()).forEach(n=>{
+    box.innerHTML+=`
+      <div style="display:flex;gap:0.3rem;margin-top:0.4rem">
+        <button class="smallBtn" style="flex:1" onclick="loadLesson('${n}')">${n}</button>
+        <button class="delete" onclick="deleteLesson('${n}')">✖</button>
+      </div>`;
+  });
+}
+
+renderLessons();
+
+/* FULL SCREEN */
+function toggleFullScreen(){
+  document.fullscreenElement
+    ? document.exitFullscreen()
+    : document.documentElement.requestFullscreen();
+}
+
+/* TEMPLATES */
 function loadTemplate(t){
   idx=0;
   activities=t===90?[
@@ -291,3 +353,4 @@ function loadTemplate(t){
 
 </body>
 </html>
+
