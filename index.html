@@ -5,173 +5,250 @@
 <title>ESL Class Timer</title>
 <style>
 :root {
-  --vus-red: #c4161c;
-  --vus-blue: #003a8f;
-  --vus-light: #f5f7fa;
-  --vus-break: #ffe5e5;
-  --vus-activity: #d0e7ff;
+  --red:#c4161c;
+  --blue:#003a8f;
+  --light:#f5f7fa;
 }
-body { font-family: system-ui, sans-serif; background: var(--vus-light); margin: 0; padding: 1rem; }
-header { text-align: center; margin-bottom: 0.5rem; }
-h1 { color: var(--vus-red); margin: 0.3rem 0; }
-#branchDisplay { color: var(--vus-blue); font-weight: 600; font-size: 1rem; }
-.container { display: flex; gap: 1rem; }
-.controls, .display { background: white; padding: 1rem; border-radius: 10px; flex: 1; border-top: 5px solid var(--vus-red); }
-.display { text-align: center; }
-#timer { font-size: 4rem; margin: 0.8rem 0; color: var(--vus-blue); transition: color 0.3s; }
-.warning { color: var(--vus-red); animation: blink 1s step-start 0s infinite; }
-@keyframes blink { 50% { opacity: 0; } }
-button { padding: 0.5rem 1rem; margin: 0.25rem 0; border-radius: 6px; border: none; background: var(--vus-blue); color: white; cursor: pointer; width: 100%; font-size: 1rem; }
-button.secondary { background: var(--vus-red); }
-.activity { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; align-items: center; padding: 0.25rem; border-radius: 6px; }
-.break { background: var(--vus-break); }
-.normal { background: var(--vus-activity); }
-input[type="text"] { flex:1; padding: 0.3rem; }
-input[type="number"] { width: 60px; padding: 0.3rem; }
-.progress { height: 22px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 0.8rem; }
-.progress-bar { height: 100%; background: var(--vus-blue); width: 100%; }
-@media (max-width: 768px) { .container { flex-direction: column; } #timer { font-size: 3.2rem; } button { font-size: 1.1rem; } }
+body {
+  margin:0;
+  padding:1rem;
+  font-family:system-ui,sans-serif;
+  background:var(--light);
+}
+header {
+  text-align:center;
+  margin-bottom:1rem;
+}
+h1{color:var(--red); margin:0.3rem 0;}
+#branch{color:var(--blue); font-weight:600;}
+
+.container {
+  display:flex;
+  gap:1rem;
+}
+.panel {
+  background:white;
+  border-radius:12px;
+  padding:1rem;
+  flex:1;
+  border-top:5px solid var(--red);
+}
+
+#timer{
+  font-size:4rem;
+  color:var(--blue);
+  margin:1rem 0;
+}
+
+.warning{
+  color:var(--red);
+  animation:blink 1s infinite;
+}
+
+@keyframes blink{
+  50%{opacity:0;}
+}
+
+button{
+  width:100%;
+  margin:0.3rem 0;
+  padding:0.6rem;
+  font-size:1rem;
+  border:none;
+  border-radius:8px;
+  background:var(--blue);
+  color:white;
+  cursor:pointer;
+}
+
+button.red{background:var(--red);}
+
+.activity{
+  display:flex;
+  gap:0.4rem;
+  margin-bottom:0.4rem;
+  padding:0.3rem;
+  border-radius:6px;
+  background:#e3f1ff;
+  align-items:center;
+}
+
+.break{background:#ffe5e5;}
+
+.activity input[type="text"]{flex:1;}
+.activity input[type="number"]{width:60px;}
+
+.progress{
+  height:20px;
+  background:#ddd;
+  border-radius:10px;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  background:var(--blue);
+  width:100%;
+}
+
+@media(max-width:768px){
+  .container{flex-direction:column;}
+  #timer{font-size:3rem;}
+}
 </style>
 </head>
+
 <body>
+
 <header>
-<h1>ESL Class Timer</h1>
-<div id="branchDisplay">VUS Hoa Binh Campus</div>
+  <h1>ESL Class Timer</h1>
+  <div id="branch">VUS Hoa Binh Campus</div>
 </header>
 
 <div class="container">
-<div class="controls">
-<h3>Lesson Templates</h3>
-<button onclick="loadTemplate(90)">90 min</button>
-<button onclick="loadTemplate(120)">120 min</button>
 
-<h3>💾 Lesson</h3>
-<button class="secondary" onclick="saveLesson()">Save lesson</button>
-<button onclick="loadLesson()">Load lesson</button>
+<div class="panel">
+  <h3>Lesson Templates</h3>
+  <button onclick="loadTemplate(90)">90 minutes</button>
+  <button onclick="loadTemplate(120)">120 minutes</button>
 
-<h3>Activities</h3>
-<div id="activityList"></div>
-<button onclick="addActivity()">➕ Add Activity</button>
-<button onclick="addBreak()">☕ Break</button>
+  <h3>Lesson</h3>
+  <button class="red" onclick="saveLesson()">Save lesson</button>
+  <button onclick="loadLesson()">Load lesson</button>
+
+  <h3>Activities</h3>
+  <div id="activities"></div>
+  <button onclick="addActivity()">➕ Add Activity</button>
+  <button onclick="addBreak()">☕ Break</button>
 </div>
 
-<div class="display">
-<h2 id="currentActivity">Ready</h2>
-<div id="timer">00:00</div>
-
-<div class="progress">
-<div id="progressBar" class="progress-bar"></div>
+<div class="panel" style="text-align:center;">
+  <h2 id="current">Ready</h2>
+  <div id="timer">00:00</div>
+  <div class="progress">
+    <div id="bar" class="bar"></div>
+  </div>
+  <button onclick="start()">Start</button>
+  <button onclick="pause()">Pause</button>
+  <button onclick="next()">Next</button>
 </div>
 
-<button onclick="start()">Start</button>
-<button onclick="pause()">Pause</button>
-<button onclick="next()">Next</button>
-</div>
 </div>
 
-<audio id="ding" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+<audio id="ding" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-let activities = [];
-let index = 0;
-let remaining = 0;
-let total = 0;
-let interval = null;
+let activities=[];
+let index=0;
+let remaining=0;
+let total=0;
+let interval=null;
 
-const activityList = document.getElementById("activityList");
-const currentActivity = document.getElementById("currentActivity");
-const timerEl = document.getElementById("timer");
-const progressBar = document.getElementById("progressBar");
-const ding = document.getElementById("ding");
+const actDiv=document.getElementById("activities");
+const timerEl=document.getElementById("timer");
+const bar=document.getElementById("bar");
+const current=document.getElementById("current");
+const ding=document.getElementById("ding");
 
-function renderActivities() {
-  activityList.innerHTML = "";
+function render(){
+  actDiv.innerHTML="";
   activities.forEach((a,i)=>{
-    const div = document.createElement("div");
-    div.className = "activity " + (a.break?"break":"normal");
-    div.innerHTML = `
+    const d=document.createElement("div");
+    d.className="activity"+(a.break?" break":"");
+    d.innerHTML=`
       <input type="text" value="${a.name}">
-      <input type="number" min="5" max="80" value="${a.minutes}">
+      <input type="number" min="5" max="80" value="${a.min}">
       <button>🦄</button>
     `;
-    const inputs = div.querySelectorAll("input");
-    inputs[0].addEventListener("change", e => a.name = e.target.value);
-    inputs[1].addEventListener("change", e => a.minutes = +e.target.value);
-    const btn = div.querySelector("button");
-    btn.style.background = "var(--vus-red)";
-    btn.style.color = "white";
-    btn.style.fontSize = "1.2rem";
-    btn.style.width = "auto";
-    btn.addEventListener("click", ()=>{ activities.splice(i,1); renderActivities(); });
-    activityList.appendChild(div);
+    d.querySelectorAll("input")[0].onchange=e=>a.name=e.target.value;
+    d.querySelectorAll("input")[1].onchange=e=>a.min=+e.target.value;
+    d.querySelector("button").onclick=()=>{
+      activities.splice(i,1);
+      render();
+    };
+    actDiv.appendChild(d);
   });
 }
 
-function updateDisplay() {
-  const m = Math.floor(remaining/60);
-  const s = remaining % 60;
-  timerEl.textContent = `${m}:${s.toString().padStart(2,"0")}`;
-  progressBar.style.width = `${remaining/total*100}%`;
-  if (remaining <= 120) { timerEl.classList.add("warning"); progressBar.style.background = "var(--vus-red)"; }
-  else { timerEl.classList.remove("warning"); progressBar.style.background = "var(--vus-blue)"; }
+function update(){
+  const m=Math.floor(remaining/60);
+  const s=remaining%60;
+  timerEl.textContent=`${m}:${s.toString().padStart(2,"0")}`;
+  bar.style.width=`${remaining/total*100}%`;
+  if(remaining<=120) timerEl.classList.add("warning");
+  else timerEl.classList.remove("warning");
 }
 
-function start() {
-  if(!activities[index] || interval) return;
-  remaining = activities[index].minutes*60;
-  total = remaining;
-  currentActivity.textContent = activities[index].name;
-  interval = setInterval(()=>{
+function start(){
+  if(interval||!activities[index])return;
+  remaining=activities[index].min*60;
+  total=remaining;
+  current.textContent=activities[index].name;
+  interval=setInterval(()=>{
+    remaining--;
+    update();
     if(remaining<=0){
       clearInterval(interval);
       interval=null;
       ding.play();
       next();
-      return;
     }
-    remaining--;
-    updateDisplay();
   },1000);
 }
 
-function pause(){ clearInterval(interval); interval=null; }
+function pause(){
+  clearInterval(interval);
+  interval=null;
+}
 
 function next(){
   pause();
   index++;
-  currentActivity.textContent = activities[index]?activities[index].name:"Class finished 🎉";
   if(activities[index]) start();
+  else current.textContent="Class finished 🎉";
 }
 
-function addActivity(){ activities.push({name:"New Activity",minutes:10}); renderActivities(); }
-function addBreak(){ activities.push({name:"Break",minutes:10,break:true}); renderActivities(); }
+function addActivity(){
+  activities.push({name:"New Activity",min:10});
+  render();
+}
 
-function saveLesson(){ localStorage.setItem("vusLesson",JSON.stringify(activities)); alert("Lesson saved ✔"); }
-function loadLesson(){ const saved=localStorage.getItem("vusLesson"); if(!saved) return alert("No saved lesson"); activities=JSON.parse(saved); index=0; renderActivities(); }
+function addBreak(){
+  activities.push({name:"Break",min:10,break:true});
+  render();
+}
 
-function loadTemplate(min){
+function saveLesson(){
+  localStorage.setItem("lesson",JSON.stringify(activities));
+  alert("Lesson saved ✔");
+}
+
+function loadLesson(){
+  const s=localStorage.getItem("lesson");
+  if(!s) return alert("No saved lesson");
+  activities=JSON.parse(s);
   index=0;
-  if(min===90) activities=[
-    {name:"Warm-up",minutes:10},
-    {name:"Vocabulary",minutes:20},
-    {name:"Break",minutes:10,break:true},
-    {name:"Speaking",minutes:30},
-    {name:"Game / Review",minutes:20}
-  ];
-  if(min===120) activities=[
-    {name:"Warm-up",minutes:10},
-    {name:"Vocabulary",minutes:25},
-    {name:"Listening",minutes:25},
-    {name:"Break",minutes:10,break:true},
-    {name:"Speaking",minutes:30},
-    {name:"Game / Review",minutes:20}
-  ];
-  renderActivities();
+  render();
 }
-});
+
+function loadTemplate(t){
+  index=0;
+  activities = t===90 ? [
+    {name:"Warm-up",min:10},
+    {name:"Vocabulary",min:20},
+    {name:"Break",min:10,break:true},
+    {name:"Speaking",min:30},
+    {name:"Game / Review",min:20}
+  ] : [
+    {name:"Warm-up",min:10},
+    {name:"Vocabulary",min:25},
+    {name:"Listening",min:25},
+    {name:"Break",min:10,break:true},
+    {name:"Speaking",min:30},
+    {name:"Game / Review",min:20}
+  ];
+  render();
+}
 </script>
-  alert("JS is running");
 
 </body>
 </html>
