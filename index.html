@@ -10,33 +10,43 @@
   --blue:#003a8f;
   --light:#f5f7fa;
 }
-body {margin:0; padding:1rem; font-family:system-ui,sans-serif; background:var(--light);}
-header{text-align:center;margin-bottom:1rem;}
+body {margin:0; padding:0; font-family:system-ui,sans-serif; background:var(--light); height:100vh; display:flex; flex-direction:column;}
+header{text-align:center; padding:0.5rem; background:white; border-bottom:3px solid var(--red);}
 h1{color:var(--red); margin:0.3rem 0; font-size:2rem;}
-#branch{color:var(--blue); font-weight:600;}
+#branch{color:var(--blue); font-weight:600; margin-bottom:0.5rem;}
 
-.container {display:flex;gap:1rem;flex-wrap:wrap;}
-.panel {background:white; border-radius:12px; padding:1rem; flex:1; min-width:280px; border-top:5px solid var(--red);}
-#timer{font-size:4rem; color:var(--blue); margin:0.5rem 0;}
+.main-container{display:flex; flex:1; gap:1rem; padding:0.5rem; flex-wrap:wrap; min-height:0;}
+.panel{background:white; border-radius:12px; padding:1rem; flex:1; min-width:280px; display:flex; flex-direction:column; border-top:5px solid var(--red);}
+.activities-container{flex:1; overflow-y:auto; padding-right:4px; display:flex; flex-direction:column; gap:0.4rem;}
+
+.activity{display:flex; flex-direction:row; align-items:flex-start; gap:0.3rem; padding:0.3rem; border-radius:6px; background:#e3f1ff; flex-wrap:wrap;}
+.activity input[type="text"]{flex:2; font-size:1rem; padding:0.3rem;}
+.activity input[type="number"]{width:60px; font-size:1rem; padding:0.3rem;}
+.activity input.note{flex:2; font-size:0.9rem; padding:0.3rem;}
+.activity button.small{padding:0.2rem 0.3rem; font-size:0.8rem;}
+
+.break{background:#ffe5e5;}
+
+#timerPanel{text-align:center;}
 #activityTitle{font-size:2rem; font-weight:600; margin:0.3rem 0;}
+#timer{font-size:4rem; color:var(--blue); margin:0.3rem 0;}
 .progress{height:20px; background:#ddd; border-radius:10px; overflow:hidden; margin-top:0.5rem;}
 .bar{height:100%; background:var(--blue); width:100%;}
+
 .warning{color:var(--red); animation:blink 1s infinite;}
 .alert5min{color:var(--orange); animation:blink 1s infinite;}
 @keyframes blink{50%{opacity:0;}}
-button{margin:0.2rem 0;padding:0.4rem;font-size:1rem;border:none;border-radius:6px;background:var(--blue);color:white;cursor:pointer;}
+
+button{margin:0.2rem 0; padding:0.5rem; font-size:1rem; border:none; border-radius:6px; background:var(--blue); color:white; cursor:pointer;}
 button.red{background:var(--red);}
-button.small{width:30px;padding:0.2rem;font-size:0.8rem;}
-.activity{display:flex;gap:0.3rem;margin-bottom:0.4rem;padding:0.2rem;border-radius:6px;background:#e3f1ff;align-items:center;}
-.activity input[type="text"]{flex:2; font-size:1rem; padding:0.2rem;}
-.activity input[type="number"]{width:50px; font-size:1rem; padding:0.2rem;}
-.activity input[type="text"].note{flex:2; font-size:0.9rem; padding:0.2rem;}
-.break{background:#ffe5e5;}
+
 @media(max-width:768px){
-  .container{flex-direction:column;}
+  .main-container{flex-direction:column;}
+  .activity{flex-direction:column;}
+  .activity input[type="text"], .activity input.note{width:100%;}
+  .activity input[type="number"], .activity button.small{width:100%; margin-top:0.2rem;}
   #timer{font-size:3rem;}
   #activityTitle{font-size:1.5rem;}
-  .activity input[type="text"], .activity input[type="text"].note{flex:3;}
 }
 </style>
 </head>
@@ -47,32 +57,33 @@ button.small{width:30px;padding:0.2rem;font-size:0.8rem;}
   <div id="branch">VUS Hoa Binh Campus</div>
 </header>
 
-<div class="container">
+<div class="main-container">
+  <!-- Activities Panel -->
+  <div class="panel">
+    <h3>Lesson Templates</h3>
+    <button onclick="loadTemplate(90)">90 minutes</button>
+    <button onclick="loadTemplate(120)">120 minutes</button>
 
-<div class="panel">
-  <h3>Lesson Templates</h3>
-  <button onclick="loadTemplate(90)">90 minutes</button>
-  <button onclick="loadTemplate(120)">120 minutes</button>
+    <h3>Lesson</h3>
+    <button class="red" onclick="saveLesson()">Save lesson</button>
+    <button onclick="loadLesson()">Load lesson</button>
 
-  <h3>Lesson</h3>
-  <button class="red" onclick="saveLesson()">Save lesson</button>
-  <button onclick="loadLesson()">Load lesson</button>
+    <h3>Activities</h3>
+    <div class="activities-container" id="activities"></div>
 
-  <h3>Activities</h3>
-  <div id="activities"></div>
-  <button onclick="addActivity()">➕ Add Activity</button>
-  <button onclick="addBreak()">☕ Break</button>
-</div>
+    <button onclick="addActivity()">➕ Add Activity</button>
+    <button onclick="addBreak()">☕ Break</button>
+  </div>
 
-<div class="panel" style="text-align:center;">
-  <div id="activityTitle">Ready</div>
-  <div id="timer">00:00</div>
-  <div class="progress"><div id="bar" class="bar"></div></div>
-  <button onclick="start()">Start</button>
-  <button onclick="pause()">Pause</button>
-  <button onclick="next()">Next</button>
-</div>
-
+  <!-- Timer Panel -->
+  <div class="panel" id="timerPanel">
+    <div id="activityTitle">Ready</div>
+    <div id="timer">00:00</div>
+    <div class="progress"><div id="bar" class="bar"></div></div>
+    <button onclick="start()">Start</button>
+    <button onclick="pause()">Pause</button>
+    <button onclick="next()">Next</button>
+  </div>
 </div>
 
 <audio id="ding" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
@@ -102,10 +113,7 @@ function render(){
     inputs[0].onchange=e=>a.name=e.target.value;
     inputs[1].onchange=e=>a.min=+e.target.value;
     inputs[2].onchange=e=>a.note=e.target.value;
-    d.querySelector("button").onclick=()=>{
-      activities.splice(i,1);
-      render();
-    };
+    d.querySelector("button").onclick=()=>{activities.splice(i,1); render();};
     actDiv.appendChild(d);
   });
 }
@@ -148,10 +156,8 @@ function next(){pause(); index++; if(activities[index]) start(); else {current.t
 
 function addActivity(){activities.push({name:"New Activity",min:10,note:""}); render();}
 function addBreak(){activities.push({name:"Break",min:10,break:true,note:""}); render();}
-
 function saveLesson(){localStorage.setItem("lesson",JSON.stringify(activities)); alert("Lesson saved ✔");}
 function loadLesson(){const s=localStorage.getItem("lesson"); if(!s)return alert("No saved lesson"); activities=JSON.parse(s); index=0; render();}
-
 function loadTemplate(t){
   index=0;
   activities = t===90 ? [
