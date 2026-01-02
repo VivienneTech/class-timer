@@ -4,89 +4,151 @@
 <meta charset="UTF-8">
 <title>ESL Class Timer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 :root {
-  --red: #c4161c;
-  --orange: #ff6600;
-  --blue: #003a8f;
-  --light: #f5f7fa;
-  --white: #ffffff;
+  --red:#c4161c;
+  --blue:#003a8f;
+  --orange:#ff8800;
+  --light:#f5f7fa;
 }
 
-body {
-  margin:0; padding:0;
-  font-family: system-ui, sans-serif;
-  background: var(--light);
-  display:flex; flex-direction:column; min-height:100vh;
+body{
+  margin:0;
+  font-family:system-ui, sans-serif;
+  background:var(--light);
 }
 
-header {
-  text-align:center; padding:0.5rem;
-  background: var(--white); border-bottom:3px solid var(--red);
-}
-h1 {margin:0.3rem 0; font-size:2rem; color: var(--red);}
-#branch {color: var(--blue); font-weight:600; font-size:1rem;}
-
-.main-container {
-  flex:1; display:flex; flex-direction:column; padding:0.5rem; gap:0.5rem; overflow:auto;
+header{
+  text-align:center;
+  padding:0.6rem;
+  background:white;
+  border-bottom:3px solid var(--red);
 }
 
-/* Activities Panel */
-.panel {background:white; border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:0.5rem;}
-.activities-container {display:flex; flex-direction:column; gap:0.4rem; max-height:300px; overflow-y:auto;}
-.activity {
-  display:flex; flex-direction:column; background:#e3f1ff; border-radius:6px; padding:0.3rem; gap:0.2rem;
+h1{margin:0;color:var(--red);}
+#branch{color:var(--blue);font-weight:600;}
+
+.main{
+  display:flex;
+  flex-direction:column;
+  gap:0.8rem;
+  padding:0.8rem;
 }
-.activity.break {background:#ffe5e5;}
-.activity input[type="text"], .activity input.note {font-size:1.2rem; padding:0.3rem; width:100%; border-radius:4px; border:1px solid #ccc;}
-.activity input[type="number"] {width:80px; font-size:1.2rem; padding:0.3rem; border-radius:4px; border:1px solid #ccc;}
-.activity button.deleteBtn {background:var(--blue); color:white; border:none; border-radius:6px; font-size:1.2rem; padding:0.5rem; cursor:pointer; width:50px; align-self:flex-end;}
-.activity button.deleteBtn:hover {opacity:0.8;}
 
-/* Timer Panel */
-#timerPanel {background:white; border-radius:12px; padding:1rem; text-align:center; display:flex; flex-direction:column; gap:0.3rem;}
-#activityContent {transition:opacity 0.5s ease; opacity:1;}
-#activityTitle {font-size:2.5rem; font-weight:600; margin:0.3rem 0;}
-#activityNote {font-size:1rem; color:#333; min-height:40px;}
-#timer {font-size:4rem; color: var(--blue); margin:0.3rem 0;}
-.progress {height:25px; background:#ddd; border-radius:12px; overflow:hidden;}
-.bar {height:100%; background: var(--blue); width:100%;}
-.warning {color: var(--red); animation: blink 1s infinite;}
-.alert5min {color: var(--orange); animation: blink 1s infinite;}
-@keyframes blink{50%{opacity:0;}}
+/* PANELS */
+.panel{
+  background:white;
+  border-radius:14px;
+  padding:1rem;
+}
 
-/* Buttons */
-button.mainBtn {font-size:1.5rem; padding:0.8rem; border:none; border-radius:8px; cursor:pointer; margin:0.2rem 0;}
-button.startBtn {background:var(--blue); color:white;}
-button.pauseBtn {background:var(--red); color:white;}
-button.nextBtn {background:var(--blue); color:white;}
-button.templateBtn {background:var(--blue); color:white; border:none; border-radius:8px; padding:0.6rem; font-size:1.2rem; margin:0.2rem 0;}
-button.saveBtn {background:var(--red); color:white; border:none; border-radius:8px; padding:0.6rem; font-size:1.2rem; margin:0.2rem 0;}
+/* ACTIVITIES */
+.activities{
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+  max-height:320px;
+  overflow-y:auto;
+}
 
-/* Responsive */
+.activity{
+  background:#e3f1ff;
+  border-radius:8px;
+  padding:0.4rem;
+  display:flex;
+  flex-direction:column;
+  gap:0.3rem;
+}
+
+.activity.break{background:#ffe5e5;}
+
+.activity input{
+  font-size:1.1rem;
+  padding:0.4rem;
+}
+
+.delete{
+  align-self:flex-end;
+  background:var(--blue);
+  color:white;
+  border:none;
+  border-radius:6px;
+  font-size:1rem;
+  padding:0.4rem 0.6rem;
+}
+
+/* TIMER */
+#title{
+  font-size:2.6rem;
+  font-weight:700;
+  text-align:center;
+}
+
+#note{
+  text-align:center;
+  min-height:40px;
+  font-size:1.1rem;
+}
+
+#time{
+  font-size:4.5rem;
+  text-align:center;
+  color:var(--blue);
+}
+
+.warning{color:var(--red);}
+.alert{color:var(--orange);}
+
+.progress{
+  height:22px;
+  background:#ddd;
+  border-radius:12px;
+  overflow:hidden;
+}
+.bar{
+  height:100%;
+  background:var(--blue);
+  width:100%;
+}
+
+/* BUTTONS */
+.btn{
+  font-size:1.6rem;
+  padding:0.9rem;
+  border:none;
+  border-radius:10px;
+  width:100%;
+}
+
+.start{background:var(--blue);color:white;}
+.pause{background:var(--red);color:white;}
+.next{background:var(--blue);color:white;}
+
+.smallBtn{
+  font-size:1.2rem;
+  padding:0.6rem;
+  margin-top:0.4rem;
+  width:100%;
+  background:var(--blue);
+  color:white;
+  border:none;
+  border-radius:8px;
+}
+
+/* RESPONSIVE */
 @media(min-width:768px){
-  .main-container {
-    flex-direction:row;
-    gap: 1rem;
-  }
-  .panel {flex:1;}
-  .activities-container {max-height:none;}
-  #activityTitle {font-size: 3rem;}
-  #timer {font-size:5rem;}
-  button.mainBtn {font-size:1.8rem; padding:1rem;}
+  .main{flex-direction:row;}
+  .panel{flex:1;}
+  #time{font-size:5.5rem;}
 }
 
 @media(min-width:1024px){
-  .main-container {gap: 2rem;}
-  .panel {padding:2rem; border-radius:16px;}
-  #activityTitle {font-size:3.5rem;}
-  #timer {font-size:6rem;}
-  .activity input[type="text"], .activity input.note {font-size:1.4rem; padding:0.5rem;}
-  button.mainBtn {font-size:2rem; padding:1.2rem;}
-  #timerPanel {flex:0 0 400px; position:sticky; top:1rem; height:fit-content;}
+  #time{font-size:6.5rem;}
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -94,151 +156,138 @@ button.saveBtn {background:var(--red); color:white; border:none; border-radius:8
   <div id="branch">VUS Hoa Binh Campus</div>
 </header>
 
-<div class="main-container">
+<div class="main">
 
-  <!-- Activities Panel -->
-  <div class="panel">
-    <h3>Lesson Templates</h3>
-    <button class="templateBtn" onclick="loadTemplate(90)">90 minutes</button>
-    <button class="templateBtn" onclick="loadTemplate(120)">120 minutes</button>
+<!-- LEFT -->
+<div class="panel">
+  <button class="smallBtn" onclick="loadTemplate(90)">90 minutes</button>
+  <button class="smallBtn" onclick="loadTemplate(120)">120 minutes</button>
 
-    <h3>Lesson</h3>
-    <button class="saveBtn" onclick="saveLesson()">Save lesson</button>
-    <button class="templateBtn" onclick="loadLesson()">Load lesson</button>
+  <div class="activities" id="activities"></div>
 
-    <h3>Activities</h3>
-    <div class="activities-container" id="activities"></div>
+  <button class="smallBtn" onclick="addActivity()">➕ Add Activity</button>
+  <button class="smallBtn" onclick="addBreak()">☕ Break</button>
+</div>
 
-    <button class="templateBtn" onclick="addActivity()">➕ Add Activity</button>
-    <button class="templateBtn" onclick="addBreak()">☕ Break</button>
-  </div>
+<!-- RIGHT -->
+<div class="panel">
+  <div id="title">Ready</div>
+  <div id="note"></div>
+  <div id="time">00:00</div>
 
-  <!-- Timer Panel -->
-  <div class="panel" id="timerPanel">
-    <div id="activityContent">
-      <div id="activityTitle">Ready</div>
-      <div id="activityNote"></div>
-    </div>
-    <div id="timer">00:00</div>
-    <div class="progress"><div id="bar" class="bar"></div></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
 
-    <button class="mainBtn startBtn" onclick="start()">Start</button>
-    <button class="mainBtn pauseBtn" onclick="pause()">Pause</button>
-    <button class="mainBtn nextBtn" onclick="next()">Next</button>
-  </div>
+  <button class="btn start" onclick="start()">START</button>
+  <button class="btn pause" onclick="pause()">PAUSE</button>
+  <button class="btn next" onclick="next()">NEXT</button>
+</div>
 
 </div>
 
-<!-- Kid-friendly sounds (MP3 for mobile compatibility) -->
-<audio id="ding3" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1f8f3e14.mp3"></audio>
-<audio id="ding2" src="https://cdn.pixabay.com/audio/2022/03/15/audio_9e5b8f7d.mp3"></audio>
-<audio id="dingEnd" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3a1bcb55.mp3"></audio>
-
 <script>
-let activities=[], index=0, remaining=0, total=0, interval=null;
-let ding3Played=false, ding2Played=false, dingEndPlayed=false;
-const actDiv=document.getElementById("activities");
-const timerEl=document.getElementById("timer");
+/* ===== BUILT-IN DING SOUND ===== */
+function playDing(count=1){
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  let t=ctx.currentTime;
+  for(let i=0;i<count;i++){
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.type="sine";
+    o.frequency.value=880;
+    g.gain.setValueAtTime(0.001,t);
+    g.gain.exponentialRampToValueAtTime(0.3,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t+0.45);
+    t+=0.5;
+  }
+}
+
+/* ===== TIMER LOGIC ===== */
+let activities=[], idx=0, remain=0, total=0, loop=null;
+let d3=false,d2=false,dEnd=false;
+
+const list=document.getElementById("activities");
+const title=document.getElementById("title");
+const note=document.getElementById("note");
+const time=document.getElementById("time");
 const bar=document.getElementById("bar");
-const current=document.getElementById("activityTitle");
-const noteEl=document.getElementById("activityNote");
-const content=document.getElementById("activityContent");
-const ding3=document.getElementById("ding3");
-const ding2=document.getElementById("ding2");
-const dingEnd=document.getElementById("dingEnd");
 
 function render(){
-  actDiv.innerHTML="";
+  list.innerHTML="";
   activities.forEach((a,i)=>{
     const d=document.createElement("div");
     d.className="activity"+(a.break?" break":"");
     d.innerHTML=`
-      <input type="text" value="${a.name}" placeholder="Activity Name">
+      <input value="${a.name}">
       <input type="number" min="5" max="80" value="${a.min}">
-      <input type="text" class="note" placeholder="Note..." value="${a.note||''}">
-      <button class="deleteBtn">🦄</button>
+      <input placeholder="Note..." value="${a.note||''}">
+      <button class="delete">🦄</button>
     `;
-    const inputs=d.querySelectorAll("input");
-    inputs[0].onchange=e=>a.name=e.target.value;
-    inputs[1].onchange=e=>a.min=+e.target.value;
-    inputs[2].onchange=e=>a.note=e.target.value;
-    d.querySelector("button").onclick=()=>{activities.splice(i,1); render();};
-
-    if(i===index) d.style.border="2px solid var(--blue)"; else d.style.border="none";
-    actDiv.appendChild(d);
+    const inp=d.querySelectorAll("input");
+    inp[0].oninput=e=>a.name=e.target.value;
+    inp[1].oninput=e=>a.min=+e.target.value;
+    inp[2].oninput=e=>a.note=e.target.value;
+    d.querySelector("button").onclick=()=>{activities.splice(i,1);render();}
+    if(i===idx)d.style.border="2px solid var(--blue)";
+    list.appendChild(d);
   });
-
-  const currentAct = actDiv.children[index];
-  if(currentAct) currentAct.scrollIntoView({behavior:"smooth", block:"center"});
+  if(list.children[idx])list.children[idx].scrollIntoView({block:"center"});
 }
 
 function update(){
-  const m=Math.floor(remaining/60);
-  const s=remaining%60;
-  timerEl.textContent=`${m}:${s.toString().padStart(2,"0")}`;
-  bar.style.width=`${remaining/total*100}%`;
-  if(remaining<=120) timerEl.className="warning";
-  else if(remaining<=300) timerEl.className="alert5min";
-  else timerEl.className="";
-}
-
-function showActivity(a){
-  content.style.opacity=0;
-  setTimeout(()=>{
-    current.textContent=a.name;
-    noteEl.textContent=a.note||'';
-    remaining=a.min*60; total=remaining;
-    ding3Played=ding2Played=dingEndPlayed=false;
-    update();
-    content.style.opacity=1;
-  },300);
+  const m=Math.floor(remain/60);
+  const s=remain%60;
+  time.textContent=`${m}:${s.toString().padStart(2,"0")}`;
+  bar.style.width=`${remain/total*100}%`;
+  time.className=remain<=120?"warning":remain<=180?"alert":"";
 }
 
 function start(){
-  if(interval||!activities[index]) return;
-  render();
-  showActivity(activities[index]);
-  interval=setInterval(()=>{
-    remaining--;
-    update();
+  if(loop||!activities[idx])return;
+  const a=activities[idx];
+  title.textContent=a.name;
+  note.textContent=a.note||"";
+  remain=a.min*60; total=remain;
+  d3=d2=dEnd=false;
+  update();
 
-    if(remaining===180 && !ding3Played){ ding3.play(); ding3Played=true;}
-    if(remaining===120 && !ding2Played){ ding2.play(); setTimeout(()=>ding2.play(),300); ding2Played=true;}
-    if(remaining<=0 && !dingEndPlayed){ dingEnd.play(); setTimeout(()=>dingEnd.play(),300); setTimeout(()=>dingEnd.play(),600); dingEndPlayed=true;}
-
-    if(remaining<=0){
-      clearInterval(interval); interval=null;
-      index++;
-      if(activities[index]) start();
-      else{current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}
+  loop=setInterval(()=>{
+    remain--; update();
+    if(remain===180&&!d3){playDing(1);d3=true;}
+    if(remain===120&&!d2){playDing(2);d2=true;}
+    if(remain<=0&&!dEnd){playDing(3);dEnd=true;}
+    if(remain<=0){
+      clearInterval(loop);loop=null;idx++;
+      activities[idx]?start():title.textContent="Class finished 🎉";
     }
   },1000);
 }
 
-function pause(){clearInterval(interval); interval=null;}
-function next(){pause(); index++; if(activities[index]) start(); else{current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}}
-function addActivity(){activities.push({name:"New Activity",min:10,note:""}); render();}
-function addBreak(){activities.push({name:"Break",min:10,break:true,note:""}); render();}
-function saveLesson(){localStorage.setItem("lesson",JSON.stringify(activities)); alert("Lesson saved ✔");}
-function loadLesson(){const s=localStorage.getItem("lesson"); if(!s) return alert("No saved lesson"); activities=JSON.parse(s); index=0; render();}
+function pause(){clearInterval(loop);loop=null;}
+function next(){pause();idx++;activities[idx]?start():title.textContent="Class finished 🎉";}
+function addActivity(){activities.push({name:"New Activity",min:10,note:""});render();}
+function addBreak(){activities.push({name:"Break",min:10,break:true,note:""});render();}
+
 function loadTemplate(t){
-  index=0;
-  activities = t===90 ? [
-    {name:"Warm-up",min:10,note:""},
-    {name:"Vocabulary",min:20,note:""},
-    {name:"Break",min:10,break:true,note:""},
-    {name:"Speaking",min:30,note:""},
-    {name:"Game / Review",min:20,note:""}
-  ] : [
-    {name:"Warm-up",min:10,note:""},
-    {name:"Vocabulary",min:25,note:""},
-    {name:"Listening",min:25,note:""},
-    {name:"Break",min:10,break:true,note:""},
-    {name:"Speaking",min:30,note:""},
-    {name:"Game / Review",min:20,note:""}
+  idx=0;
+  activities=t===90?[
+    {name:"Warm-up",min:10},
+    {name:"Vocabulary",min:20},
+    {name:"Break",min:10,break:true},
+    {name:"Speaking",min:30},
+    {name:"Game / Review",min:20}
+  ]:[
+    {name:"Warm-up",min:10},
+    {name:"Vocabulary",min:25},
+    {name:"Listening",min:25},
+    {name:"Break",min:10,break:true},
+    {name:"Speaking",min:30},
+    {name:"Game / Review",min:20}
   ];
   render();
 }
 </script>
+
 </body>
 </html>
