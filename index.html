@@ -12,12 +12,14 @@
   --light: #f5f7fa;
   --white: #ffffff;
 }
+
 body {
   margin:0; padding:0;
   font-family: system-ui, sans-serif;
   background: var(--light);
   display:flex; flex-direction:column; min-height:100vh;
 }
+
 header {
   text-align:center; padding:0.5rem;
   background: var(--white); border-bottom:3px solid var(--red);
@@ -29,7 +31,7 @@ h1 {margin:0.3rem 0; font-size:2rem; color: var(--red);}
   flex:1; display:flex; flex-direction:column; padding:0.5rem; gap:0.5rem; overflow:auto;
 }
 
-/* Activities List */
+/* Activities Panel */
 .panel {background:white; border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:0.5rem;}
 .activities-container {display:flex; flex-direction:column; gap:0.4rem; max-height:300px; overflow-y:auto;}
 .activity {
@@ -61,11 +63,27 @@ button.nextBtn {background:var(--blue); color:white;}
 button.templateBtn {background:var(--blue); color:white; border:none; border-radius:8px; padding:0.6rem; font-size:1.2rem; margin:0.2rem 0;}
 button.saveBtn {background:var(--red); color:white; border:none; border-radius:8px; padding:0.6rem; font-size:1.2rem; margin:0.2rem 0;}
 
+/* Responsive */
 @media(min-width:768px){
-  .main-container {flex-direction:row;}
+  .main-container {
+    flex-direction:row;
+    gap: 1rem;
+  }
+  .panel {flex:1;}
   .activities-container {max-height:none;}
+  #activityTitle {font-size: 3rem;}
   #timer {font-size:5rem;}
-  #activityTitle {font-size:3rem;}
+  button.mainBtn {font-size:1.8rem; padding:1rem;}
+}
+
+@media(min-width:1024px){
+  .main-container {gap: 2rem;}
+  .panel {padding:2rem; border-radius:16px;}
+  #activityTitle {font-size:3.5rem;}
+  #timer {font-size:6rem;}
+  .activity input[type="text"], .activity input.note {font-size:1.4rem; padding:0.5rem;}
+  button.mainBtn {font-size:2rem; padding:1.2rem;}
+  #timerPanel {flex:0 0 400px; position:sticky; top:1rem; height:fit-content;}
 }
 </style>
 </head>
@@ -111,19 +129,23 @@ button.saveBtn {background:var(--red); color:white; border:none; border-radius:8
 
 </div>
 
-<audio id="ding" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
-<audio id="ding5" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<!-- Kid-friendly sounds -->
+<audio id="ding3" src="https://actions.google.com/sounds/v1/alarms/bell_short.ogg"></audio>
+<audio id="ding2" src="https://actions.google.com/sounds/v1/alarms/bell_ring.ogg"></audio>
+<audio id="dingEnd" src="https://actions.google.com/sounds/v1/alarms/bell_tone.ogg"></audio>
 
 <script>
 let activities=[], index=0, remaining=0, total=0, interval=null;
+let ding3Played=false, ding2Played=false, dingEndPlayed=false;
 const actDiv=document.getElementById("activities");
 const timerEl=document.getElementById("timer");
 const bar=document.getElementById("bar");
 const current=document.getElementById("activityTitle");
 const noteEl=document.getElementById("activityNote");
 const content=document.getElementById("activityContent");
-const ding=document.getElementById("ding");
-const ding5=document.getElementById("ding5");
+const ding3=document.getElementById("ding3");
+const ding2=document.getElementById("ding2");
+const dingEnd=document.getElementById("dingEnd");
 
 function render(){
   actDiv.innerHTML="";
@@ -141,8 +163,14 @@ function render(){
     inputs[1].onchange=e=>a.min=+e.target.value;
     inputs[2].onchange=e=>a.note=e.target.value;
     d.querySelector("button").onclick=()=>{activities.splice(i,1); render();};
+
+    if(i===index) d.style.border="2px solid var(--blue)"; else d.style.border="none";
     actDiv.appendChild(d);
   });
+
+  // scroll current activity into view
+  const currentAct = actDiv.children[index];
+  if(currentAct) currentAct.scrollIntoView({behavior:"smooth", block:"center"});
 }
 
 function update(){
@@ -161,6 +189,8 @@ function showActivity(a){
     current.textContent=a.name;
     noteEl.textContent=a.note||'';
     remaining=a.min*60; total=remaining;
+    // reset bells
+    ding3Played=ding2Played=dingEndPlayed=false;
     update();
     content.style.opacity=1;
   },300);
@@ -168,24 +198,35 @@ function showActivity(a){
 
 function start(){
   if(interval||!activities[index]) return;
+  render();
   showActivity(activities[index]);
   interval=setInterval(()=>{
     remaining--;
     update();
-    if(remaining===300) ding5.play();
+
+    // 3 minutes before end
+    if(remaining===180 && !ding3Played){ding3.play(); ding3Played=true;}
+    // 2 minutes before end → 2 quick dings
+    if(remaining===120 && !ding2Played){ding2.play(); setTimeout(()=>ding2.play(),300); ding2Played=true;}
+    // Time's up → 3 dings
+    if(remaining<=0 && !dingEndPlayed){dingEnd.play(); setTimeout(()=>dingEnd.play(),300); setTimeout(()=>dingEnd.play(),600); dingEndPlayed=true;}
+
     if(remaining<=0){
       clearInterval(interval);
       interval=null;
-      ding.play();
       index++;
       if(activities[index]) start();
-      else{current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}
+      else{
+        current.textContent="Class finished 🎉";
+        noteEl.textContent="";
+        timerEl.textContent="00:00";
+      }
     }
   },1000);
 }
 
 function pause(){clearInterval(interval); interval=null;}
-function next(){pause(); index++; if(activities[index]) start(); else {current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}}
+function next(){pause(); index++; if(activities[index]) start(); else{current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}}
 
 function addActivity(){activities.push({name:"New Activity",min:10,note:""}); render();}
 function addBreak(){activities.push({name:"Break",min:10,break:true,note:""}); render();}
@@ -210,6 +251,5 @@ function loadTemplate(t){
   render();
 }
 </script>
-
 </body>
 </html>
