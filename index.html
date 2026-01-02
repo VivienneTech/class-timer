@@ -129,10 +129,10 @@ button.saveBtn {background:var(--red); color:white; border:none; border-radius:8
 
 </div>
 
-<!-- Kid-friendly sounds -->
-<audio id="ding3" src="https://actions.google.com/sounds/v1/alarms/bell_short.ogg"></audio>
-<audio id="ding2" src="https://actions.google.com/sounds/v1/alarms/bell_ring.ogg"></audio>
-<audio id="dingEnd" src="https://actions.google.com/sounds/v1/alarms/bell_tone.ogg"></audio>
+<!-- Kid-friendly sounds (MP3 for mobile compatibility) -->
+<audio id="ding3" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1f8f3e14.mp3"></audio>
+<audio id="ding2" src="https://cdn.pixabay.com/audio/2022/03/15/audio_9e5b8f7d.mp3"></audio>
+<audio id="dingEnd" src="https://cdn.pixabay.com/audio/2022/03/15/audio_3a1bcb55.mp3"></audio>
 
 <script>
 let activities=[], index=0, remaining=0, total=0, interval=null;
@@ -168,7 +168,6 @@ function render(){
     actDiv.appendChild(d);
   });
 
-  // scroll current activity into view
   const currentAct = actDiv.children[index];
   if(currentAct) currentAct.scrollIntoView({behavior:"smooth", block:"center"});
 }
@@ -189,7 +188,6 @@ function showActivity(a){
     current.textContent=a.name;
     noteEl.textContent=a.note||'';
     remaining=a.min*60; total=remaining;
-    // reset bells
     ding3Played=ding2Played=dingEndPlayed=false;
     update();
     content.style.opacity=1;
@@ -204,30 +202,21 @@ function start(){
     remaining--;
     update();
 
-    // 3 minutes before end
-    if(remaining===180 && !ding3Played){ding3.play(); ding3Played=true;}
-    // 2 minutes before end → 2 quick dings
-    if(remaining===120 && !ding2Played){ding2.play(); setTimeout(()=>ding2.play(),300); ding2Played=true;}
-    // Time's up → 3 dings
-    if(remaining<=0 && !dingEndPlayed){dingEnd.play(); setTimeout(()=>dingEnd.play(),300); setTimeout(()=>dingEnd.play(),600); dingEndPlayed=true;}
+    if(remaining===180 && !ding3Played){ ding3.play(); ding3Played=true;}
+    if(remaining===120 && !ding2Played){ ding2.play(); setTimeout(()=>ding2.play(),300); ding2Played=true;}
+    if(remaining<=0 && !dingEndPlayed){ dingEnd.play(); setTimeout(()=>dingEnd.play(),300); setTimeout(()=>dingEnd.play(),600); dingEndPlayed=true;}
 
     if(remaining<=0){
-      clearInterval(interval);
-      interval=null;
+      clearInterval(interval); interval=null;
       index++;
       if(activities[index]) start();
-      else{
-        current.textContent="Class finished 🎉";
-        noteEl.textContent="";
-        timerEl.textContent="00:00";
-      }
+      else{current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}
     }
   },1000);
 }
 
 function pause(){clearInterval(interval); interval=null;}
 function next(){pause(); index++; if(activities[index]) start(); else{current.textContent="Class finished 🎉"; noteEl.textContent=""; timerEl.textContent="00:00";}}
-
 function addActivity(){activities.push({name:"New Activity",min:10,note:""}); render();}
 function addBreak(){activities.push({name:"Break",min:10,break:true,note:""}); render();}
 function saveLesson(){localStorage.setItem("lesson",JSON.stringify(activities)); alert("Lesson saved ✔");}
