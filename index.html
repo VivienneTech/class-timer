@@ -46,15 +46,6 @@ h1{margin:0;color:var(--red);}
   flex-direction:column;
 }
 
-/* TOTALS */
-#totalTime,
-#remainingTime{
-  font-weight:700;
-  color:var(--blue);
-  text-align:center;
-  margin-bottom:0.4rem;
-}
-
 /* ACTIVITIES */
 .activities{
   display:flex;
@@ -88,6 +79,25 @@ h1{margin:0;color:var(--red);}
   padding:0.4rem;
   font-size:1rem;
   align-self:flex-end;
+}
+
+/* TOTALS */
+#totalTime{
+  font-weight:800;
+  font-size:1.6rem;
+  color:var(--blue);
+  text-align:center;
+  margin-top:0.8rem;
+  padding-top:0.4rem;
+  border-top:1px solid #ddd;
+}
+
+#remainingTime{
+  font-weight:900;
+  font-size:1.9rem;
+  color:var(--red);
+  text-align:center;
+  margin-top:0.3rem;
 }
 
 /* TIMER */
@@ -159,6 +169,7 @@ h1{margin:0;color:var(--red);}
   to{background:white;}
 }
 
+/* TABLET & UP */
 @media(min-width:768px){
   .main{flex-direction:row;}
   .panel{flex:1;}
@@ -178,13 +189,14 @@ h1{margin:0;color:var(--red);}
 
 <!-- LEFT PANEL -->
 <div class="panel">
-  <div id="totalTime">Total Time: 0 min</div>
-  <div id="remainingTime">Remaining Class Time: 0 min</div>
 
   <div class="activities" id="activities"></div>
 
   <button class="smallBtn" onclick="addActivity()">➕ Add Activity</button>
   <button class="smallBtn" onclick="addBreak()">☕ Break</button>
+
+  <div id="totalTime">Total Time: 0 min</div>
+  <div id="remainingTime">Remaining Class Time: 0 min</div>
 </div>
 
 <!-- RIGHT PANEL -->
@@ -243,18 +255,15 @@ function updateTotalTime(){
 /* REMAINING CLASS TIME */
 function updateRemainingClassTime(){
   let sec=0;
-
   if(activities[idx]){
     sec+=remain;
     for(let i=idx+1;i<activities.length;i++){
       sec+=activities[i].min*60;
     }
   }
-
   const mins=Math.ceil(sec/60);
   const h=Math.floor(mins/60);
   const m=mins%60;
-
   remainingTimeEl.textContent=
     `Remaining Class Time: ${mins} min${h?` (${h}h ${m}m)`:``}`;
 }
@@ -337,4 +346,3 @@ function toggleFullScreen(){
 
 </body>
 </html>
-
