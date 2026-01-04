@@ -46,12 +46,13 @@ h1{margin:0;color:var(--red);}
   flex-direction:column;
 }
 
-/* TOTAL TIME */
-#totalTime{
+/* TOTALS */
+#totalTime,
+#remainingTime{
   font-weight:700;
   color:var(--blue);
   text-align:center;
-  margin-bottom:0.6rem;
+  margin-bottom:0.4rem;
 }
 
 /* ACTIVITIES */
@@ -158,7 +159,6 @@ h1{margin:0;color:var(--red);}
   to{background:white;}
 }
 
-/* TABLET & UP */
 @media(min-width:768px){
   .main{flex-direction:row;}
   .panel{flex:1;}
@@ -179,6 +179,7 @@ h1{margin:0;color:var(--red);}
 <!-- LEFT PANEL -->
 <div class="panel">
   <div id="totalTime">Total Time: 0 min</div>
+  <div id="remainingTime">Remaining Class Time: 0 min</div>
 
   <div class="activities" id="activities"></div>
 
@@ -228,6 +229,7 @@ const note=document.getElementById("note");
 const time=document.getElementById("time");
 const bar=document.getElementById("bar");
 const totalTimeEl=document.getElementById("totalTime");
+const remainingTimeEl=document.getElementById("remainingTime");
 
 /* TOTAL TIME */
 function updateTotalTime(){
@@ -236,6 +238,25 @@ function updateTotalTime(){
   const m=mins%60;
   totalTimeEl.textContent=
     `Total Time: ${mins} min${h?` (${h}h ${m}m)`:``}`;
+}
+
+/* REMAINING CLASS TIME */
+function updateRemainingClassTime(){
+  let sec=0;
+
+  if(activities[idx]){
+    sec+=remain;
+    for(let i=idx+1;i<activities.length;i++){
+      sec+=activities[i].min*60;
+    }
+  }
+
+  const mins=Math.ceil(sec/60);
+  const h=Math.floor(mins/60);
+  const m=mins%60;
+
+  remainingTimeEl.textContent=
+    `Remaining Class Time: ${mins} min${h?` (${h}h ${m}m)`:``}`;
 }
 
 /* RENDER */
@@ -252,13 +273,14 @@ function render(){
     `;
     const inp=d.querySelectorAll("input");
     inp[0].oninput=e=>a.name=e.target.value;
-    inp[1].oninput=e=>{a.min=+e.target.value;updateTotalTime();}
+    inp[1].oninput=e=>{a.min=+e.target.value;updateTotalTime();updateRemainingClassTime();}
     inp[2].oninput=e=>a.note=e.target.value;
     d.querySelector("button").onclick=()=>{activities.splice(i,1);render();}
     if(i===idx)d.style.border="2px solid var(--blue)";
     list.appendChild(d);
   });
   updateTotalTime();
+  updateRemainingClassTime();
 }
 
 /* TIMER */
@@ -269,6 +291,7 @@ function update(){
   bar.style.width=`${remain/total*100}%`;
   time.className=remain<=120?"critical":"";
   bar.className=remain<=120?"bar critical":"bar";
+  updateRemainingClassTime();
 }
 
 function start(){
@@ -286,13 +309,13 @@ function start(){
       clearInterval(loop); loop=null;
       playDing(2);
       idx++;
-      activities[idx]?start():title.textContent="Class finished 🎉";
+      activities[idx]?start():remainingTimeEl.textContent="Remaining Class Time: 0 min";
     }
   },1000);
 }
 
 function pause(){clearInterval(loop);loop=null;}
-function next(){pause();idx++;activities[idx]?start():title.textContent="Class finished 🎉";}
+function next(){pause();idx++;activities[idx]?start():remainingTimeEl.textContent="Remaining Class Time: 0 min";}
 
 /* ACTIVITY */
 function addActivity(){
@@ -314,3 +337,4 @@ function toggleFullScreen(){
 
 </body>
 </html>
+
